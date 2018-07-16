@@ -1,19 +1,17 @@
--- meiner Meinung nach ist alles irgendwie hochgradig redundant
-
--- Berechnet c_0/c = (kappa_0 - kappa_inf) / (kappa_t - kappa_inf)
+-- calculates c_0/c = (kappa_0 - kappa_inf) / (kappa_t - kappa_inf)
 c0pc :: [Float] -> [Float]
 c0pc c = let k0 = head (tail c)
              ki = head (tail (tail c))
              kt = tail (tail (tail c))
          in [ (k0 - ki) / (x - ki) | x <- kt ]
 
--- Liest die Messwerte ein und gibt direkt c_0/c aus
+-- reads in the measurings and returns c_0/c
 getNumbers :: String -> [[Float]]
 getNumbers c = map c0pc (map (map readFloat) (map words (lines c)))
     where
         readFloat = read :: String -> Float
 
--- Liest die Konzentrationen ein, c
+-- reads the concentrations, c
 getConcentrations :: String -> [Float]
 getConcentrations c = map head (map (map readFloat) (map words (lines c)))
     where
@@ -35,65 +33,66 @@ sumC2X2 c x = sum [ i^2 * j^2 | i <- x, j <- c ]
 sumCXY :: [Float] -> [Float] -> [[Float]] -> Float
 sumCXY c x y = sum (zipWith(*) [ i * j | j <- c, i <- x ] (concat y))
 
--- Berechnet den y-Achsenabschnitt, 1
+-- calculates the intercept, A
 intercept :: [Float] -> [Float] -> [[Float]] -> Float
 intercept c x y = ( sumCX c x * sumCXY c x y  - sumC2X2 c x * sumY y ) / ( (sumCX c x)^2 - m * n * sumC2X2 c x )
     where
         m = fromIntegral (length c)
         n = fromIntegral (length x)
 
--- Berechnet die Steigung, k
+-- calculates the slope, B
 slope :: [Float] -> [Float] -> [[Float]] -> Float
 slope c x y = ( sumCX c x * sumY y - m * n * sumCXY c x y) / ( (sumCX c x)^2 - m * n * sumC2X2 c x)
     where
         m = fromIntegral (length c)
         n = fromIntegral (length x)
 
--- Summe der Residuenquadrate, sum_i^n sum_j^m r_ij^2
+-- calculates the sum of the squared residuals, sum_i^n sum_j^m r_ij^2
 sumResiduals2 :: [Float] -> [Float] -> [[Float]] -> Float
 sumResiduals2 c x y = sum [ z^2 | z <- (zipWith(-) (concat y) [ a + b * i * j | j <- c, i <- x ]) ]
     where
         a = intercept c x y
         b = slope c x y
 
--- Reststreuung der Messwerte y, s
+-- error of the measuring values y_ij, s
 restS :: [Float] -> [Float] -> [[Float]] -> Float
 restS c x y = sqrt ( (sumResiduals2 c x y) / ( n - 2 * m ) )
     where
         m = fromIntegral (length c)
         n = fromIntegral (length x)
 
--- Streuung des y-Achsenabschnitts, s(A)
+-- error of the intercept, s(A)
 interceptError :: [Float] -> [Float] -> [[Float]] -> Float
 interceptError c x y = (restS c x y) * sqrt (sumC2X2 c x / ( n * m * sumC2X2 c x - (sumCX c x)^2 ))
     where
         m = fromIntegral (length c)
         n = fromIntegral (length x)
 
--- Streuung der Steigung, s(B)
+-- error of the slope, s(B)
 slopeError :: [Float] -> [Float] -> [[Float]] -> Float
 slopeError c x y = (restS c x y) * sqrt (n * m / ( n * m * sumC2X2 c x - (sumCX c x)^2 ))
       where
           m = fromIntegral (length c)
           n = fromIntegral (length x)
 
--- Messzeiten 30s bis 300s alle 30s, 360s bis 600s alle 60s
--- ... wuerde ich eigentlich ganz gerne noch mit einlesen
+-- the times at which the measurements were made
+-- 30s to 300s every 30s, 360s to 600s every 60s
+-- will get read in in a future version
 times :: [Float]
 times = map (60*) ([ x / 2 | x <- [1 .. 10] ] ++ [6.0 .. 10.0])
 
--- Fuehrt die Rechnungen dann mal aus
+-- the actual calculations
 calc :: FilePath -> IO()
 calc fname = do
     contents <- readFile fname
-    putStr "1: "
+    putStr "A: "
     print $ intercept (getConcentrations contents) times (getNumbers contents)
-    putStr "s(1): "
+    putStr "s(A): "
     print $ interceptError (getConcentrations contents) times (getNumbers contents)
     putStrLn ""
-    putStr "k [l mol^-1 s^-1]: "
+    putStr "B [l mol^-1 s^-1]: "
     print $ slope (getConcentrations contents) times (getNumbers contents)
-    putStr "s(k) [l mol^-1 s^-1]: "
+    putStr "s(B) [l mol^-1 s^-1]: "
     print $ slopeError (getConcentrations contents) times (getNumbers contents)
 
 main :: IO()
@@ -101,6 +100,6 @@ main = do
     putStrLn "Which input file to process?"
     inputFile <- getLine
     putStrLn ""
-    putStrLn "y_ij = 1 + c_j k x_i"
+    putStrLn "y_ij = A + c_j B x_i"
     putStrLn ""
     calc inputFile
