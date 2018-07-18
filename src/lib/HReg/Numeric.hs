@@ -1,6 +1,5 @@
 module HReg.Numeric
-(
-
+( regression
 ) where
 import           Data.List
 import           Data.Maybe
@@ -62,6 +61,62 @@ sumC2X2 c x = sum $ (*) <$> map (^2) c <*> map (^2) x
 sumCXY :: (Num a) => [a] -> [a] -> [[a]] -> a
 sumCXY c x y = sum $ zipWith (*) ((*) <$> c <*> x) (concat y)
 
+-- | Do the regression
+regression :: [LinRegValues] -> Maybe RegressionResult
+regression vals
+  | timesAllTheSame = Just RegressionResult
+    { intercept = intercept'
+    , slope = slope'
+    , interceptError = interceptError'
+    , slopeError = slopeError'
+    }
+  | otherwise = Nothing
+  where
+    intercept' =
+      (sCX * sCXY - sC2X2 * sY) /
+      (sCX^2 - m * n * sC2X2)
+    slope' =
+      (sCX * sY - m * n * sCXY) /
+      (sCX^2 - m * n * sC2X2)
+    sumResiduals2' =
+      sum . map (^2) $ z
+    restS' =
+      sqrt $ sR2 / (n - 2 * m)
+    interceptError' =
+      rS * sqrt (
+      sC2X2 /
+      (n * m * sC2X2 - sCX^2)
+      )
+    slopeError' =
+      rS * sqrt (
+      n * m /
+      (n * m * sC2X2 - sCX^2)
+      )
+    --
+    c' = map c vals
+    mVals = map c0pc vals
+    t' = nub . map (map $ fmap ((/10^12) . fromIntegral . diffTimeToPicoseconds) . fst) $ mVals
+    timesAllTheSame = length t' == 1
+    t'' = head t'
+    t''' =
+      [ fromMaybe (genT i) (t'' !! i)
+      | i <- [0 .. length t'' - 1]
+      ]
+    x' = t'''
+    y' = map (map snd) mVals
+    sCX = sumCX c' x'
+    sCXY = sumCXY c' x' y'
+    sC2X2 = sumC2X2 c' x'
+    sY = sumY y'
+    m = fromIntegral . length $ c'
+    n = fromIntegral . length $ x'
+    a = intercept'
+    b = slope'
+    z = zipWith (-) (concat y') [ a + b * i * j | j <- c', i <- x' ]
+    sR2 = sumResiduals2'
+    rS = restS'
+
+{-
 -- | calculate the intercept of a set of fixed c0 measurements
 intercept :: [LinRegValues] -> Maybe Double
 intercept vals
@@ -147,7 +202,7 @@ sumResiduals2 vals
 
 restS :: [LinRegValues] -> Maybe Double
 restS vals
-  | timesAllTheSame && isJust sR2= Just $
+  | timesAllTheSame && isJust sR2 = Just $
     sqrt $
     sR2' /
     (n - 2 * m)
@@ -265,3 +320,4 @@ slopeError vals
     rS = restS vals
       -- this is safe because of laziness and the check at top level
     rS' = fromJust rS
+-}
