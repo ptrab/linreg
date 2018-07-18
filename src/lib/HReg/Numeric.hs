@@ -63,7 +63,7 @@ sumCXY :: (Num a) => [a] -> [a] -> [[a]] -> a
 sumCXY c x y = sum $ zipWith (*) ((*) <$> c <*> x) (concat y)
 
 -- | calculate the intercept of a set of fixed c0 measurements
---intercept :: (Num a) => [LinRegValues] -> Maybe [a]
+intercept :: [LinRegValues] -> Maybe Double
 intercept vals
   | timesAllTheSame = Just $
     (sCX * sCXY - sC2X2 * sY) /
@@ -87,3 +87,181 @@ intercept vals
     sY = sumY y'
     m = fromIntegral . length $ c'
     n = fromIntegral . length $ x'
+
+slope :: [LinRegValues] -> Maybe Double
+slope vals
+  | timesAllTheSame = Just $
+    (sCX * sY - m * n * sCXY) /
+    (sCX^2 - m * n * sC2X2)
+
+  | otherwise = Nothing
+  where
+    c' = map c vals
+    mVals = map c0pc vals
+    t' = nub . map (map $ fmap ((/10^12) . fromIntegral . diffTimeToPicoseconds) . fst) $ mVals
+    timesAllTheSame = length t' == 1
+    t'' = head t'
+    t''' =
+      [ fromMaybe (genT i) (t'' !! i)
+      | i <- [0 .. length t'' - 1]
+      ]
+    x' = t'''
+    y' = map (map snd) mVals
+    sCX = sumCX c' x'
+    sCXY = sumCXY c' x' y'
+    sC2X2 = sumC2X2 c' x'
+    sY = sumY y'
+    m = fromIntegral . length $ c'
+    n = fromIntegral . length $ x'
+
+sumResiduals2 :: [LinRegValues] -> Maybe Double
+sumResiduals2 vals
+  | timesAllTheSame && isJust a && isJust b = Just $
+    sum . map (^2) $ z
+  | otherwise = Nothing
+  where
+    c' = map c vals
+    mVals = map c0pc vals
+    t' = nub . map (map $ fmap ((/10^12) . fromIntegral . diffTimeToPicoseconds) . fst) $ mVals
+    timesAllTheSame = length t' == 1
+    t'' = head t'
+    t''' =
+      [ fromMaybe (genT i) (t'' !! i)
+      | i <- [0 .. length t'' - 1]
+      ]
+    x' = t'''
+    y' = map (map snd) mVals
+    sCX = sumCX c' x'
+    sCXY = sumCXY c' x' y'
+    sC2X2 = sumC2X2 c' x'
+    sY = sumY y'
+    m = fromIntegral . length $ c'
+    n = fromIntegral . length $ x'
+    --
+    a = intercept vals
+    b = slope vals
+    -- this is safe because of laziness and the check at top level
+    a' = fromJust a
+    b' = fromJust b
+    z = zipWith (-) (concat y') [ a' + b' * i * j | j <- c', i <- x' ]
+
+restS :: [LinRegValues] -> Maybe Double
+restS vals
+  | timesAllTheSame && isJust sR2= Just $
+    sqrt $
+    sR2' /
+    (n - 2 * m)
+  | otherwise = Nothing
+  where
+    c' = map c vals
+    mVals = map c0pc vals
+    t' = nub . map (map $ fmap ((/10^12) . fromIntegral . diffTimeToPicoseconds) . fst) $ mVals
+    timesAllTheSame = length t' == 1
+    t'' = head t'
+    t''' =
+      [ fromMaybe (genT i) (t'' !! i)
+      | i <- [0 .. length t'' - 1]
+      ]
+    x' = t'''
+    y' = map (map snd) mVals
+    sCX = sumCX c' x'
+    sCXY = sumCXY c' x' y'
+    sC2X2 = sumC2X2 c' x'
+    sY = sumY y'
+    m = fromIntegral . length $ c'
+    n = fromIntegral . length $ x'
+    --
+    a = intercept vals
+    b = slope vals
+      -- this is safe because of laziness and the check at top level
+    a' = fromJust a
+    b' = fromJust b
+    z = zipWith (-) (concat y') [ a' + b' * i * j | j <- c', i <- x' ]
+    --
+    sR2 = sumResiduals2 vals
+      -- this is safe because of laziness and the check at top level
+    sR2' = fromJust sR2
+
+interceptError :: [LinRegValues] -> Maybe Double
+interceptError vals
+  | timesAllTheSame && isJust rS = Just $
+    rS' * sqrt (
+    sC2X2 /
+    (n * m * sC2X2 - sCX^2)
+    )
+  | otherwise = Nothing
+  where
+    c' = map c vals
+    mVals = map c0pc vals
+    t' = nub . map (map $ fmap ((/10^12) . fromIntegral . diffTimeToPicoseconds) . fst) $ mVals
+    timesAllTheSame = length t' == 1
+    t'' = head t'
+    t''' =
+      [ fromMaybe (genT i) (t'' !! i)
+      | i <- [0 .. length t'' - 1]
+      ]
+    x' = t'''
+    y' = map (map snd) mVals
+    sCX = sumCX c' x'
+    sCXY = sumCXY c' x' y'
+    sC2X2 = sumC2X2 c' x'
+    sY = sumY y'
+    m = fromIntegral . length $ c'
+    n = fromIntegral . length $ x'
+    --
+    a = intercept vals
+    b = slope vals
+      -- this is safe because of laziness and the check at top level
+    a' = fromJust a
+    b' = fromJust b
+    z = zipWith (-) (concat y') [ a' + b' * i * j | j <- c', i <- x' ]
+    --
+    sR2 = sumResiduals2 vals
+      -- this is safe because of laziness and the check at top level
+    sR2' = fromJust sR2
+    --
+    rS = restS vals
+      -- this is safe because of laziness and the check at top level
+    rS' = fromJust rS
+
+slopeError :: [LinRegValues] -> Maybe Double
+slopeError vals
+  | timesAllTheSame && isJust rS = Just $
+    rS' * sqrt (
+    n * m /
+    (n * m * sC2X2 - sCX^2)
+    )
+  | otherwise = Nothing
+  where
+    c' = map c vals
+    mVals = map c0pc vals
+    t' = nub . map (map $ fmap ((/10^12) . fromIntegral . diffTimeToPicoseconds) . fst) $ mVals
+    timesAllTheSame = length t' == 1
+    t'' = head t'
+    t''' =
+      [ fromMaybe (genT i) (t'' !! i)
+      | i <- [0 .. length t'' - 1]
+      ]
+    x' = t'''
+    y' = map (map snd) mVals
+    sCX = sumCX c' x'
+    sCXY = sumCXY c' x' y'
+    sC2X2 = sumC2X2 c' x'
+    sY = sumY y'
+    m = fromIntegral . length $ c'
+    n = fromIntegral . length $ x'
+    --
+    a = intercept vals
+    b = slope vals
+      -- this is safe because of laziness and the check at top level
+    a' = fromJust a
+    b' = fromJust b
+    z = zipWith (-) (concat y') [ a' + b' * i * j | j <- c', i <- x' ]
+    --
+    sR2 = sumResiduals2 vals
+      -- this is safe because of laziness and the check at top level
+    sR2' = fromJust sR2
+    --
+    rS = restS vals
+      -- this is safe because of laziness and the check at top level
+    rS' = fromJust rS
