@@ -61,6 +61,25 @@ sumC2X2 c x = sum $ (*) <$> map (^2) c <*> map (^2) x
 sumCXY :: (Num a) => [a] -> [a] -> [[a]] -> a
 sumCXY c x y = sum $ zipWith (*) ((*) <$> c <*> x) (concat y)
 
+-- | Mean of a list
+-- |   sum_i^n x_i / n
+mean :: (Fractional a) => [a] -> a
+mean x = (sum x) / (fromIntegral (length x))
+
+-- | Rsquared
+-- |   1 - sum_i^n sum_j^m (y_ij - f(x_i))^2 / sum_i^n sum_j^m (y_ij - y_bar)^2
+--rSquared :: (Num a) => [a] -> [[a]] -> a
+--rSquared c x y = 1 - SSreg / SStot
+--    where
+--        fX = [ intercept' + slope' * i * j | j <- c, i <- x ] 
+--        m = fromIntegral (length y)
+--        n = fromIntegral (length x)
+--        ssReg = sum [ (i - j)^2 | i <- (concat y), j <- (concat fX) ]
+--        yBar = map mean y
+--        ssTot = sum . map (^2) $ zipWith (-) (concat y) (concat [ replicate n i | i <- yBar ])
+--        intercept' = intercept c x y
+--        slope' = slope c x y
+
 -- | Do the regression
 regression :: [LinRegValues] -> Maybe RegressionResult
 regression vals
@@ -69,6 +88,7 @@ regression vals
     , slope = slope'
     , interceptError = interceptError'
     , slopeError = slopeError'
+    , rSquared = rSquared'
     }
   | otherwise = Nothing
   where
@@ -92,6 +112,8 @@ regression vals
       n * m /
       (n * m * sC2X2 - sCX^2)
       )
+    rSquared' =
+     1 - ssReg / ssTot
     --
     c' = map c vals
     mVals = map c0pc vals
@@ -110,8 +132,14 @@ regression vals
     sY = sumY y'
     m = fromIntegral . length $ c'
     n = fromIntegral . length $ x'
+    n' = length $ x'
     a = intercept'
     b = slope'
     z = zipWith (-) (concat y') [ a + b * i * j | j <- c', i <- x' ]
     sR2 = sumResiduals2'
     rS = restS'
+    --fX = [ intercept' + slope' * i * j | j <- c, i <- x ]
+    --ssReg = sum [ (i - j)^2 | i <- (concat y), j <- (concat fX) ]
+    ssReg = sumResiduals2'
+    yBar = map mean y'
+    ssTot = sum . map (^2) $ zipWith (-) (concat y') (concat [ replicate n' i | i <- yBar ])
