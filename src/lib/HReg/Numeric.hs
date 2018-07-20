@@ -66,20 +66,6 @@ sumCXY c x y = sum $ zipWith (*) ((*) <$> c <*> x) (concat y)
 mean :: (Fractional a) => [a] -> a
 mean x = (sum x) / (fromIntegral (length x))
 
--- | Rsquared
--- |   1 - sum_i^n sum_j^m (y_ij - f(x_i))^2 / sum_i^n sum_j^m (y_ij - y_bar)^2
---rSquared :: (Num a) => [a] -> [[a]] -> a
---rSquared c x y = 1 - SSreg / SStot
---    where
---        fX = [ intercept' + slope' * i * j | j <- c, i <- x ] 
---        m = fromIntegral (length y)
---        n = fromIntegral (length x)
---        ssReg = sum [ (i - j)^2 | i <- (concat y), j <- (concat fX) ]
---        yBar = map mean y
---        ssTot = sum . map (^2) $ zipWith (-) (concat y) (concat [ replicate n i | i <- yBar ])
---        intercept' = intercept c x y
---        slope' = slope c x y
-
 -- | Do the regression
 regression :: [LinRegValues] -> Maybe RegressionResult
 regression vals
@@ -101,7 +87,7 @@ regression vals
     sumResiduals2' =
       sum . map (^2) $ z
     restS' =
-      sqrt $ sR2 / (n - 2 * m)
+      sqrt $ sR2 / (m * (n - 2))
     interceptError' =
       rS * sqrt (
       sC2X2 /
