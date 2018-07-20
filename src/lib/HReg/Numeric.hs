@@ -124,8 +124,6 @@ regression vals
     z = zipWith (-) (concat y') [ a + b * i * j | j <- c', i <- x' ]
     sR2 = sumResiduals2'
     rS = restS'
-    --fX = [ intercept' + slope' * i * j | j <- c, i <- x ]
-    --ssReg = sum [ (i - j)^2 | i <- (concat y), j <- (concat fX) ]
     ssReg = sumResiduals2'
     yBar = map mean y'
     ssTot = sum . map (^2) $ zipWith (-) (concat y') (concat [ replicate n' i | i <- yBar ])
