@@ -1,0 +1,62 @@
+name:                linreg
+version:             0.1.0.0
+github:              "ptrab/linreg"
+license:             GPL-3
+author:              "Philipp Traber"
+maintainer:          "phillip.traber@uni-jena.de"
+copyright:           "2019 Philipp Traber"
+
+extra-source-files:
+  - LICENSE
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description: Fitting ester hydrolysis kinetics correctly
+
+dependencies:
+  - base >= 4.7 && < 5
+  - text >= 1.2.3.1
+  - attoparsec >= 0.13.2.2
+  - time >= 1.8.0.2
+
+library:
+  source-dirs: src/lib
+  ghc-options:
+    - -optP-Wno-nonportable-include-path
+    - -O2
+    - -Wall
+    - -Wno-unused-top-binds
+    - -Wno-unused-local-binds
+    - -Wno-type-defaults
+    # - -static
+    # - -fPIC
+    # - -optl-static
+    # - -optl-pthread
+    #- -optc-static
+
+executables:
+  exckel:
+    main: linreg.hs
+    source-dirs: src/app
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -optP-Wno-nonportable-include-path
+      - -O2
+      - -Wall
+      - -Wno-unused-top-binds
+      - -Wno-unused-local-binds
+      - -Wno-type-defaults
+      # - -static
+      # - -fPIC
+      # - -optl-static
+      # - -optl-pthread
+      #- -optc-static
+    dependencies:
+      - linreg

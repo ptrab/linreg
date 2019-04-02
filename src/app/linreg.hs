@@ -1,7 +1,7 @@
 import           Data.Attoparsec.Text.Lazy
 import qualified Data.Text.IO              as T
-import           HReg.Numeric
-import           HReg.Parser
+import           Linreg.Numeric
+import           Linreg.Parser
 import           System.Environment
 
 main :: IO ()

@@ -1,12 +1,10 @@
-module HReg.Parser
+module Linreg.Parser
 ( parse_LinRegValues
 ) where
+import           Control.Applicative
 import           Data.Attoparsec.Text.Lazy
-import qualified Data.Text                 as T
-import qualified Data.Text.IO              as T
-import           HReg.Types
-import Control.Applicative
-import Data.Time
+import           Data.Time
+import           Linreg.Types
 
 -- | Parse the input file. It contains in a very simple format:
 -- |   c (first value in row)
@@ -46,7 +44,7 @@ parse_LinRegValues = do
           kappaT' <- double
           _ <- many' $ char ' ' <|> char '\t'
           return (Nothing, kappaT')
-        Just x -> do
+        Just _ -> do
           _ <- many' $ char ' ' <|> char '\t'
           time' <- secondsToDiffTime <$> decimal
           _ <- many' $ char ' ' <|> char '\t'

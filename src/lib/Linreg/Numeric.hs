@@ -1,10 +1,10 @@
-module HReg.Numeric
+module Linreg.Numeric
 ( regression
 ) where
 import           Data.List
 import           Data.Maybe
 import           Data.Time
-import           HReg.Types
+import           Linreg.Types
 
 --------------------------------------------------------------------------------
 -- helper functions
@@ -49,17 +49,17 @@ sumY y = sum . concat $ y
 -- | Calculates the sum over the c*x products
 -- |   sum_i^n sum_j^m c_j x_i
 sumCX :: (Num a) => [a] -> [a] -> a
-sumCX c x = sum $ (*) <$> c <*> x
+sumCX c' x = sum $ (*) <$> c' <*> x
 
 -- | Sum of all squared c and x values
 -- |   sum_i^n sum_j^m c_j^2 x_i^2
 sumC2X2 :: (Num a) => [a] -> [a] -> a
-sumC2X2 c x = sum $ (*) <$> map (^2) c <*> map (^2) x
+sumC2X2 c' x = sum $ (*) <$> map (^2) c' <*> map (^2) x
 
 -- | Zipping products
 -- |   sum_i^n sum_j^m c_j x_i y_ij
 sumCXY :: (Num a) => [a] -> [a] -> [[a]] -> a
-sumCXY c x y = sum $ zipWith (*) ((*) <$> c <*> x) (concat y)
+sumCXY c' x y = sum $ zipWith (*) ((*) <$> c' <*> x) (concat y)
 
 -- | Mean of a list
 -- |   sum_i^n x_i / n

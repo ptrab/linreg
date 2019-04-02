@@ -1,9 +1,8 @@
-module HReg.Types
+module Linreg.Types
 ( LinRegValues(..)
 , RegressionResult(..)
 ) where
 import           Data.Time
-import           Data.Text
 import           Text.Printf
 
 -- | what we get from the measurements
