@@ -10,8 +10,7 @@ data LinRegValues = LinRegValues
   { c        :: Double                     -- concentration of this series
   , kappa0   :: Double
   , kappaInf :: Double
-  , kappaT   :: [(Maybe DiffTime, Double)] -- the optional time and corresping
-                                           --   kappa_t
+  , kappaT   :: [(DiffTime, Double)]       -- the  time and corresping kappa_t
   }
 
 -- | what we calculate by regression from the measurements

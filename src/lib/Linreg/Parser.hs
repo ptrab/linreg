@@ -1,57 +1,54 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Linreg.Parser
-( parse_LinRegValues
+( linRegValues
 ) where
-import           Control.Applicative
 import           Data.Attoparsec.Text.Lazy
 import           Data.Time
 import           Linreg.Types
+import Prelude hiding (takeWhile)
 
--- | Parse the input file. It contains in a very simple format:
--- |   c (first value in row)
--- |   kappa0 (second value in row)
--- |   kappaInf (third value in row)
--- |   kappaT (many values, possibly associated with a time. If no time is
--- |     there, than it shall be a whitespace seperated double.
--- |     If time is there it shall follow the format "(Seconds, kappaT)"
-parse_LinRegValues :: Parser LinRegValues
-parse_LinRegValues = do
-  c' <- double
-  _ <- many1 $ char ' ' <|> char '\t'
-
-  kappa0' <- double
-  _ <- many1 $ char ' ' <|> char '\t'
-
-  kappaInf' <- double
-  _ <- many1 $ char ' ' <|> char '\t'
-
-  kappaT' <- many1 parse_kappaT
-
-  endOfLine
-
-  return LinRegValues
-    { c        = c'
-    , kappa0   = kappa0'
-    , kappaInf = kappaInf'
-    , kappaT   = kappaT'
-    }
-
-  where
-    parse_kappaT :: Parser (Maybe DiffTime, Double)
-    parse_kappaT = do
-      hasTime <- option Nothing (Just <$> char '(')
-      case hasTime of
-        Nothing -> do
-          kappaT' <- double
-          _ <- many' $ char ' ' <|> char '\t'
-          return (Nothing, kappaT')
-        Just _ -> do
-          _ <- many' $ char ' ' <|> char '\t'
-          time' <- secondsToDiffTime <$> decimal
-          _ <- many' $ char ' ' <|> char '\t'
-          _ <- many' $ char ','
-          _ <- many' $ char ' ' <|> char '\t'
-          kappaT' <- double
-          _ <- many' $ char ' ' <|> char '\t'
-          _ <- char ')'
-          _ <- many' $ char ' ' <|> char '\t'
-          return (Just time', kappaT')
+-- | Parsing a single block with same "t" as shown in this repository (see "input" file).
+linRegValues :: Parser [LinRegValues]
+linRegValues = do
+  -- Parse first line of a block, starting with a "t", followed by many times in seconds
+  timeSeries <- do
+    skipSpace
+    _ <- string "t"
+    _ <- takeWhile isHorizontalSpace
+    times <- many1 $ do
+      time <- double
+      _ <- takeWhile isHorizontalSpace
+      return time
+    endOfLine
+    return times
+  -- Parse multiple lines of concentration series. First number is c0, then followed by
+  -- (length times) concentrations corresponding to the times and then kappa0 and kappaInf
+  linregSeries <- many1 $ do
+    _ <- takeWhile isHorizontalSpace
+    c' <- double
+    _ <- takeWhile isHorizontalSpace
+    kappaT' <- count (length timeSeries) $ do
+      cAtTime <- double
+      _ <- takeWhile isHorizontalSpace
+      return cAtTime
+    _ <- takeWhile isHorizontalSpace
+    _ <- string "kappa0"
+    _ <- takeWhile isHorizontalSpace
+    _ <- string "="
+    _ <- takeWhile isHorizontalSpace
+    kappa0' <- double
+    _ <- takeWhile isHorizontalSpace
+    _ <- string "kappaInf"
+    _ <- takeWhile isHorizontalSpace
+    _ <- string "="
+    _ <- takeWhile isHorizontalSpace
+    kappaInf' <- double
+    _ <- takeWhile isHorizontalSpace
+    endOfLine
+    return LinRegValues
+      { c        = c'
+      , kappa0   = kappa0'
+      , kappaInf = kappaInf'
+      , kappaT   = zip (map (picosecondsToDiffTime . (* 10^12) . round) $ timeSeries) kappaT'
+      }
+  return linregSeries

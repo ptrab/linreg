@@ -8,7 +8,7 @@ main :: IO ()
 main = do
   inputFilePath <- head <$> getArgs
   rawVals <- T.readFile inputFilePath
-  let vals = parseOnly (many1 parse_LinRegValues) rawVals
+  let vals = concat <$> parseOnly (many1 linRegValues) rawVals
       results = regression <$> vals
   case results of
     Right (Just x) -> putStr $ show x

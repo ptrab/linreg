@@ -2,7 +2,6 @@ module Linreg.Numeric
 ( regression
 ) where
 import           Data.List
-import           Data.Maybe
 import           Data.Time
 import           Linreg.Types
 
@@ -31,7 +30,7 @@ genT i
 -- regression logic
 --------------------------------------------------------------------------------
 -- | calculate c0/c = (kappa0 - kappaInf) / (kappaT - kappaInf)
-c0pc :: LinRegValues -> [(Maybe DiffTime, Double)]
+c0pc :: LinRegValues -> [(DiffTime, Double)]
 c0pc vals =
   [ (fst i, (kappa0' - kappaInf') / (snd i - kappaInf'))
   | i <- kappaT'
@@ -103,14 +102,10 @@ regression vals
     --
     c' = map c vals
     mVals = map c0pc vals
-    t' = nub . map (map $ fmap ((/10^12) . fromIntegral . diffTimeToPicoseconds) . fst) $ mVals
+    t' = nub . map (map $ (/10^12) . fromIntegral . diffTimeToPicoseconds . fst) $ mVals
     timesAllTheSame = length t' == 1
     t'' = head t'
-    t''' =
-      [ fromMaybe (genT i) (t'' !! i)
-      | i <- [0 .. length t'' - 1]
-      ]
-    x' = t'''
+    x' = t''
     y' = map (map snd) mVals
     sCX = sumCX c' x'
     sCXY = sumCXY c' x' y'
