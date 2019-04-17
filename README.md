@@ -7,4 +7,4 @@ but a fit of many *y_ij* over their resp. *x_i*, `y_ij = a + b * c_j * x_i`.
 In other words, if you have values to be fitted that can be described by the same fitting parameters A and B
 and the slope only differs by a parameter, you can fit all together.
 
-![linear fit of four measure series](/images/abx1.png?raw=true)
+![linear fit of four measure series](/abx1.png?raw=true)
