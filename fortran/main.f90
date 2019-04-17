@@ -269,8 +269,6 @@ contains
         !- this routine calculates not the slope for a combined fit
         !- of all measure series but calculates the slope for each
         !- of them an calculates the mean afterwards
-        implicit none
-
         integer :: cnt = 1
         real(dp) :: tmp
         real(dp), dimension(sum(nConc)) :: allSlopes
@@ -300,8 +298,6 @@ contains
     end subroutine
 
     subroutine printResults
-        implicit none
-
         write (*, '(A)') 'FITTING RESULTS'
         write (*, *) ''
         write (*, '(A, 2F15.7)') '  Intersection A with s(A):   ', A, sA
@@ -312,9 +308,7 @@ contains
         write (*, '(A)') ''
     end subroutine
 
-    subroutine deallocAll()
-        implicit none
-
+    subroutine deallocAll
         deallocate (nConc)
         deallocate (nTimes)
         deallocate (conc)
