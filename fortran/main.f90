@@ -7,9 +7,7 @@ module allRoutines
 
     !- variables of type: INTEGER
     !- i, j and k are simple counters
-    !- M is the number of measurement series
-    !- N is the total amount of measure points
-    integer :: i, j, k, M, N
+    integer :: i, j, k, sOne
     !- the number of input blocks ... most probably 1
     !- if no averaging over multiple groups is wanted
     !- or if for one concentration an outlier has been removed
@@ -158,8 +156,7 @@ contains
 
     subroutine calcSums
         !- the variables are explained at the beginning of the module
-        N = 0
-        M = 0
+        sOne = dot_product(nConc, nTimes)
         !- how to calculate the sums is explained in the following loop
         Sy = 0.0_dp
         Scx = 0.0_dp
@@ -172,14 +169,8 @@ contains
             !- iterate over all measure series per block
             do j = 1, nConc(i)
 
-                !- count the number of measure series M
-                M = M + 1
-
                 !- iterate over all measure points per block and concentration
                 do k = 1, nTimes(i)
-
-                    !- count the total number of measure points N
-                    N = N + 1
 
                     !- sum all relative concentrations c_0/c:
                     !-   sum_i=1^M sum_j=1^(N_i) (c_0/c)_ij
@@ -202,7 +193,7 @@ contains
 
         !- print intermediate results
         if (DEBUG .eqv. .TRUE.) then
-            write (*, '(A, I0, A, I0)') 'M: ', M, '   N: ', N
+            write (*, '(A, I15.0)') 's1:                 ', sOne
             write (*, '(A, F15.7)') 'sum(c_0/c):         ', Sy
             write (*, '(A, F15.7)') 'sum(c * t):         ', Scx
             write (*, '(A, F15.7)') 'sum(c * t * c_0/c): ', Scxy
@@ -213,10 +204,10 @@ contains
 
     subroutine calcAB
         !- intercept A
-        A = (Scx * Scxy - Sc2x2 * Sy) / (Scx**2 - Sc2x2 * N)
+        A = (Scx * Scxy - Sc2x2 * Sy) / (Scx**2 - Sc2x2 * sOne)
 
         !- slope B
-        B = (Sy * Scx - N * Scxy) / (Scx**2 - Sc2x2 * N)
+        B = (Sy * Scx -  sOne * Scxy) / (Scx**2 - Sc2x2 * sOne)
 
         !- print intermediate results
         if (DEBUG .eqv. .TRUE.) then
@@ -231,7 +222,9 @@ contains
         !- sum of squared residues
         sSqRes = 0.0_dp
         do i = 1, nBlocks
+
             do j = 1, nConc(i)
+
                 c0mean = sum(c0pc(i, j, :)) / nTimes(i)
                 do k = 1, nTimes(i)
                     tmp = c0pc(i, j, k) - A - conc(i, j) * B * times(i, k)
@@ -243,13 +236,13 @@ contains
         end do
 
         !- Reststreuung ... leftover(?) variance
-        s = sqrt(sSqRes / (N - 2 * M))
+        s = sqrt(sSqRes / (sOne - 2.0_dp * sum(nConc)))
 
         !- variance of A
-        sA = s * sqrt(Sc2x2 / (N * Sc2x2 - Scx**2))
+        sA = s * sqrt(Sc2x2 / (sOne * Sc2x2 - Scx**2))
 
         !- variance of B
-        sB = s * sqrt(N / (N * Sc2x2 - Scx**2))
+        sB = s * sqrt(sOne / (sOne * Sc2x2 - Scx**2))
 
         !- coefficient of determination, R^2
         rSq = 1.0_dp - sSqRes / ssTot
