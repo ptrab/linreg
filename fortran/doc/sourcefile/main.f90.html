@@ -5,12 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
    
-   <meta name="description" content="This program calculates the fitting parameters for a linear least-squares problem.">
+   <meta name="description" content="This program calculates the fitting parameters for a linear least-squares">
     
-    <meta name="author" content="" >
+    <meta name="author" content="Philipp Traber" >
     <link rel="icon" href="../favicon.png">
 
-    <title>main.f90 &ndash; Fortran Program</title>
+    <title>main.f90 &ndash; Linreg</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -44,7 +44,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">Fortran Program </a>
+          <a class="navbar-brand" href="../index.html">Linreg </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -721,44 +721,44 @@
 <a name="ln-434"></a>
 <a name="ln-435"></a><span class="k">                </span><span class="n">tmp</span> <span class="o">=</span> <span class="n">nTimes</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">sum_tc0pc</span> <span class="o">-</span> <span class="n">sum_t</span> <span class="o">*</span> <span class="n">sum_c0pc</span>
 <a name="ln-436"></a>                <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span> <span class="o">/</span> <span class="p">(</span><span class="n">nTimes</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">sum_t2</span> <span class="o">-</span> <span class="p">(</span><span class="n">sum_t</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-<a name="ln-437"></a>                <span class="n">allSlopes</span><span class="p">(</span><span class="n">cnt</span><span class="p">)</span> <span class="o">=</span> <span class="n">tmp</span> <span class="o">/</span> <span class="n">conc</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
-<a name="ln-438"></a>                <span class="n">cnt</span> <span class="o">=</span> <span class="n">cnt</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-439"></a>            <span class="k">end do</span>
-<a name="ln-440"></a><span class="k">        end do</span>
-<a name="ln-441"></a>
-<a name="ln-442"></a><span class="k">        </span><span class="n">meanSlope</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">allSlopes</span><span class="p">)</span> <span class="o">/</span> <span class="n">size</span><span class="p">(</span><span class="n">allSlopes</span><span class="p">)</span>
-<a name="ln-443"></a>    <span class="k">end subroutine</span>
-<a name="ln-444"></a>
-<a name="ln-445"></a><span class="k">    subroutine </span><span class="n">printResults</span>
-<a name="ln-446"></a>        <span class="c">!! Print all the results, which are: \(A\) and \(B\), \(s(A)\) and \(s(B)\),</span>
-<a name="ln-447"></a>        <span class="c">!! \(R^2\) and \(\overline{B_{ij}}\)</span>
-<a name="ln-448"></a>
-<a name="ln-449"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(A)&#39;</span><span class="p">)</span> <span class="s1">&#39;FITTING RESULTS&#39;</span>
-<a name="ln-450"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-451"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(A, 2F15.7)&#39;</span><span class="p">)</span> <span class="s1">&#39;  Intersection A with s(A):   &#39;</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">varA</span>
-<a name="ln-452"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(A, 2F15.7)&#39;</span><span class="p">)</span> <span class="s1">&#39;  Slope B with s(B):          &#39;</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">varB</span>
-<a name="ln-453"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(A,  F15.7)&#39;</span><span class="p">)</span> <span class="s1">&#39;  Coef. of determination R^2: &#39;</span><span class="p">,</span> <span class="n">rSq</span>
-<a name="ln-454"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-455"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(A,  F15.7)&#39;</span><span class="p">)</span> <span class="s1">&#39;  Mean slope of single fits:  &#39;</span><span class="p">,</span> <span class="n">meanSlope</span>
-<a name="ln-456"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(A)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-457"></a>    <span class="k">end subroutine</span>
-<a name="ln-458"></a>
-<a name="ln-459"></a><span class="k">    subroutine </span><span class="n">deallocAll</span>
-<a name="ln-460"></a>        <span class="c">!! Deallocate all arrays</span>
-<a name="ln-461"></a>
-<a name="ln-462"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">nConc</span><span class="p">)</span>
-<a name="ln-463"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">nTimes</span><span class="p">)</span>
-<a name="ln-464"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">conc</span><span class="p">)</span>
-<a name="ln-465"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">kappa0</span><span class="p">)</span>
-<a name="ln-466"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">kappaInf</span><span class="p">)</span>
-<a name="ln-467"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">times</span><span class="p">)</span>
-<a name="ln-468"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">kappa</span><span class="p">)</span>
-<a name="ln-469"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">c0pc</span><span class="p">)</span>
-<a name="ln-470"></a>    <span class="k">end subroutine</span>
-<a name="ln-471"></a><span class="k">end module</span>
-<a name="ln-472"></a>
-<a name="ln-473"></a><span class="k">program </span><span class="n">main</span>
-<a name="ln-474"></a>    <span class="c">!! Philipp Traber</span>
+<a name="ln-437"></a>
+<a name="ln-438"></a>                <span class="n">allSlopes</span><span class="p">(</span><span class="n">cnt</span><span class="p">)</span> <span class="o">=</span> <span class="n">tmp</span> <span class="o">/</span> <span class="n">conc</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+<a name="ln-439"></a>                <span class="n">cnt</span> <span class="o">=</span> <span class="n">cnt</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-440"></a>            <span class="k">end do</span>
+<a name="ln-441"></a><span class="k">        end do</span>
+<a name="ln-442"></a>
+<a name="ln-443"></a><span class="k">        </span><span class="n">meanSlope</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">allSlopes</span><span class="p">)</span> <span class="o">/</span> <span class="n">size</span><span class="p">(</span><span class="n">allSlopes</span><span class="p">)</span>
+<a name="ln-444"></a>    <span class="k">end subroutine</span>
+<a name="ln-445"></a>
+<a name="ln-446"></a><span class="k">    subroutine </span><span class="n">printResults</span>
+<a name="ln-447"></a>        <span class="c">!! Print all the results, which are: \(A\) and \(B\), \(s(A)\) and \(s(B)\),</span>
+<a name="ln-448"></a>        <span class="c">!! \(R^2\) and \(\overline{B_{ij}}\)</span>
+<a name="ln-449"></a>
+<a name="ln-450"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(A)&#39;</span><span class="p">)</span> <span class="s1">&#39;FITTING RESULTS&#39;</span>
+<a name="ln-451"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-452"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(A, 2F15.7)&#39;</span><span class="p">)</span> <span class="s1">&#39;  Intersection A with s(A):   &#39;</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">varA</span>
+<a name="ln-453"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(A, 2F15.7)&#39;</span><span class="p">)</span> <span class="s1">&#39;  Slope B with s(B):          &#39;</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">varB</span>
+<a name="ln-454"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(A,  F15.7)&#39;</span><span class="p">)</span> <span class="s1">&#39;  Coef. of determination R^2: &#39;</span><span class="p">,</span> <span class="n">rSq</span>
+<a name="ln-455"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-456"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(A,  F15.7)&#39;</span><span class="p">)</span> <span class="s1">&#39;  Mean slope of single fits:  &#39;</span><span class="p">,</span> <span class="n">meanSlope</span>
+<a name="ln-457"></a>        <span class="k">write</span> <span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(A)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-458"></a>    <span class="k">end subroutine</span>
+<a name="ln-459"></a>
+<a name="ln-460"></a><span class="k">    subroutine </span><span class="n">deallocAll</span>
+<a name="ln-461"></a>        <span class="c">!! Deallocate all arrays</span>
+<a name="ln-462"></a>
+<a name="ln-463"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">nConc</span><span class="p">)</span>
+<a name="ln-464"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">nTimes</span><span class="p">)</span>
+<a name="ln-465"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">conc</span><span class="p">)</span>
+<a name="ln-466"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">kappa0</span><span class="p">)</span>
+<a name="ln-467"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">kappaInf</span><span class="p">)</span>
+<a name="ln-468"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">times</span><span class="p">)</span>
+<a name="ln-469"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">kappa</span><span class="p">)</span>
+<a name="ln-470"></a>        <span class="k">deallocate</span> <span class="p">(</span><span class="n">c0pc</span><span class="p">)</span>
+<a name="ln-471"></a>    <span class="k">end subroutine</span>
+<a name="ln-472"></a><span class="k">end module</span>
+<a name="ln-473"></a>
+<a name="ln-474"></a><span class="k">program </span><span class="n">main</span>
 <a name="ln-475"></a>    <span class="k">use </span><span class="n">allRoutines</span>
 <a name="ln-476"></a>    <span class="k">implicit none</span>
 <a name="ln-477"></a>
@@ -807,7 +807,7 @@
             
           </p>
         </div>
-        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> Fortran Program was developed by </p></div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> Linreg was developed by Philipp Traber</p></div>
       </div>
       <br>
       </div> <!-- /container -->    

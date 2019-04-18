@@ -434,6 +434,7 @@ contains
 
                 tmp = nTimes(i) * sum_tc0pc - sum_t * sum_c0pc
                 tmp = tmp / (nTimes(i) * sum_t2 - (sum_t)**2)
+
                 allSlopes(cnt) = tmp / conc(i, j)
                 cnt = cnt + 1
             end do
@@ -471,7 +472,6 @@ contains
 end module
 
 program main
-    !! Philipp Traber
     use allRoutines
     implicit none
 
