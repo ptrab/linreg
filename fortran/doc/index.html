@@ -5,12 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
    
-   <meta name="description" content="This program calculates the fitting parameters for a linear least-squares problem.">
+   <meta name="description" content="This program calculates the fitting parameters for a linear least-squares">
     
-    <meta name="author" content="" >
+    <meta name="author" content="Philipp Traber" >
     <link rel="icon" href="./favicon.png">
 
-    <title> Fortran Program </title>
+    <title> Linreg </title>
 
     <link href="./css/bootstrap.min.css" rel="stylesheet">
     <link href="./css/pygments.css" rel="stylesheet">
@@ -44,7 +44,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="./index.html">Fortran Program </a>
+          <a class="navbar-brand" href="./index.html">Linreg </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -108,27 +108,57 @@
     
       <!-- Main component for a primary marketing message or call to action -->
       <div class="jumbotron">
-        <p>This program calculates the fitting parameters for a linear least-squares problem.</p>
+        <p>This program calculates the fitting parameters for a linear least-squares</p>
         	 
+	<p> Find us on&hellip;</p>
+        <p>
+        	 
+          <a class="btn btn-lg btn-primary" href="https://github.com/ptrab/linreg/blob/master/fortran" role="button">GitHub</a>
+			 
+			 
+			 
+			 
+	         
 			 
         </p>
       </div>
 
       <div class="row" id='text'>
 		  
-        <div class="col-md-12">
+        <div class="col-md-8">
 		  
-          <h1>Fortran Program</h1>
-          <p>However, it is not a "simple" regression in a way of y over x, which is fitted by y_i = a + b * x_i,
-but a fit of many y_ij over their resp. x_i, y_ij = a + b * c_j * x_i.</p>
-<p>In other words, if you have values to be fitted that can be described by the same fitting parameters A and B
-and the slope only differs by a parameter, you can fit all together.
-Authors: Philipp Traber
-Date: April 18, 2019</p>
-<p>Project: Linreg
-Project_Github: https://github.com/ptrab/linreg/blob/master/fortran</p>
+          <h1>Linreg</h1>
+          <p>problem. However, it is not a <em>simple</em> regression in a way of <code>y</code> over <code>x</code>, which
+is fitted by <code>y_i = a + b * x_i</code>, but a fit of many <code>y_ijk</code> over their resp. <code>x_ik</code>,
+<code>y_ijk = a + b * c_ij * x_ik</code>.<br>
+In other words, if you have values to be fitted that can be described by the same
+fitting parameters <code>A</code> and <code>B</code> and the slope only differs by a parameter, you can
+fit all together.</p>
         </div>
 		  
+        <div class="col-md-4">
+	  <div class="well">
+          <h2>Developer Info</h2>
+          <h4>Philipp Traber</h4>
+          
+          <p>I am a doctoral student from Jena, Germany.</p>
+			   
+            <div class="text-center"><div class="btn-group" role="group">
+              
+              
+              
+              <a class="btn btn-lg btn-primary" href="https://github.com/ptrab"><i class="fa fa-github fa-lg"></i></a>
+				  
+				  
+              
+              
+              
+              
+            </div></div>
+            
+       </div>
+       </div>
+       
       </div>
       
       
@@ -215,7 +245,7 @@ Project_Github: https://github.com/ptrab/linreg/blob/master/fortran</p>
             
           </p>
         </div>
-        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> Fortran Program was developed by </p></div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> Linreg was developed by Philipp Traber</p></div>
       </div>
       <br>
       </div> <!-- /container -->    
