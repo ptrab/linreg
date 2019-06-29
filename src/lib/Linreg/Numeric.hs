@@ -1,10 +1,9 @@
-module HReg.Numeric
+module Linreg.Numeric
 ( regression
 ) where
 import           Data.List
-import           Data.Maybe
 import           Data.Time
-import           HReg.Types
+import           Linreg.Types
 
 --------------------------------------------------------------------------------
 -- helper functions
@@ -31,7 +30,7 @@ genT i
 -- regression logic
 --------------------------------------------------------------------------------
 -- | calculate c0/c = (kappa0 - kappaInf) / (kappaT - kappaInf)
-c0pc :: LinRegValues -> [(Maybe DiffTime, Double)]
+c0pc :: LinRegValues -> [(DiffTime, Double)]
 c0pc vals =
   [ (fst i, (kappa0' - kappaInf') / (snd i - kappaInf'))
   | i <- kappaT'
@@ -49,17 +48,17 @@ sumY y = sum . concat $ y
 -- | Calculates the sum over the c*x products
 -- |   sum_i^n sum_j^m c_j x_i
 sumCX :: (Num a) => [a] -> [a] -> a
-sumCX c x = sum $ (*) <$> c <*> x
+sumCX c' x = sum $ (*) <$> c' <*> x
 
 -- | Sum of all squared c and x values
 -- |   sum_i^n sum_j^m c_j^2 x_i^2
 sumC2X2 :: (Num a) => [a] -> [a] -> a
-sumC2X2 c x = sum $ (*) <$> map (^2) c <*> map (^2) x
+sumC2X2 c' x = sum $ (*) <$> map (^2) c' <*> map (^2) x
 
 -- | Zipping products
 -- |   sum_i^n sum_j^m c_j x_i y_ij
 sumCXY :: (Num a) => [a] -> [a] -> [[a]] -> a
-sumCXY c x y = sum $ zipWith (*) ((*) <$> c <*> x) (concat y)
+sumCXY c' x y = sum $ zipWith (*) ((*) <$> c' <*> x) (concat y)
 
 -- | Mean of a list
 -- |   sum_i^n x_i / n
@@ -103,14 +102,10 @@ regression vals
     --
     c' = map c vals
     mVals = map c0pc vals
-    t' = nub . map (map $ fmap ((/10^12) . fromIntegral . diffTimeToPicoseconds) . fst) $ mVals
+    t' = nub . map (map $ (/10^12) . fromIntegral . diffTimeToPicoseconds . fst) $ mVals
     timesAllTheSame = length t' == 1
     t'' = head t'
-    t''' =
-      [ fromMaybe (genT i) (t'' !! i)
-      | i <- [0 .. length t'' - 1]
-      ]
-    x' = t'''
+    x' = t''
     y' = map (map snd) mVals
     sCX = sumCX c' x'
     sCXY = sumCXY c' x' y'

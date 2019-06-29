@@ -1,9 +1,8 @@
-module HReg.Types
+module Linreg.Types
 ( LinRegValues(..)
 , RegressionResult(..)
 ) where
 import           Data.Time
-import           Data.Text
 import           Text.Printf
 
 -- | what we get from the measurements
@@ -11,8 +10,7 @@ data LinRegValues = LinRegValues
   { c        :: Double                     -- concentration of this series
   , kappa0   :: Double
   , kappaInf :: Double
-  , kappaT   :: [(Maybe DiffTime, Double)] -- the optional time and corresping
-                                           --   kappa_t
+  , kappaT   :: [(DiffTime, Double)]       -- the  time and corresping kappa_t
   }
 
 -- | what we calculate by regression from the measurements
